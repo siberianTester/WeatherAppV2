@@ -29,28 +29,44 @@ struct Location: Decodable {
     let region: String
     let lat: String
     let lon: String
-    let timezone_id: String
+    let timezoneId: String
     let localtime: String
-    let localtime_epoch: Int
-    let utc_offset: String
+    let localtimeEpoch: Int
+    let utcOffset: String
 }
 
 // MARK: - Current Struct
 struct Current: Decodable {
-    let observation_time: String
+    let observationTime: String
     let temperature: Int
-    let weather_code: Int
-    let weather_icons: [URL]
-    let weather_descriptions: [String]
-    let wind_speed: Int
-    let wind_degree: Int
-    let wind_dir: String
+    let weatherCode: Int
+    let weatherIcons: [URL]
+    let weatherDescriptions: [String]
+    let windSpeed: Int
+    let windDegree: Int
+    let windDir: String
     let pressure: Int
     let precip: Int
     let humidity: Int
     let cloudcover: Int
     let feelslike: Int
-    let uv_index: Int
+    let uvIndex: Int
     let visibility: Int
-    let is_day: String
+    let isDay: String
+    
+    var weatherParameters: String {
+        """
+        Wind speed: \(String(windSpeed)) mph
+        
+        Wind direction: \(String(windDir))
+        
+        Pressure: \(String(pressure)) mb
+        
+        Humidity: \(String(humidity)) %
+        
+        Visibility: \(String(visibility)) miles
+        
+        Observation time: \(observationTime)
+        """
+    }
 }
