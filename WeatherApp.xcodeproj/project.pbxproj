@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F727AD42D10983C0029CFD7 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 1F727AD32D10983C0029CFD7 /* Alamofire */; };
 		1F7498582CFB65E600D090A3 /* Extension + UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7498572CFB65E600D090A3 /* Extension + UIView.swift */; };
 		1F74985A2CFC9E6D00D090A3 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F7498592CFC9E6D00D090A3 /* NetworkManager.swift */; };
 		1F8CF7B12CF7A08800E157DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8CF7B02CF7A08800E157DB /* AppDelegate.swift */; };
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F727AD42D10983C0029CFD7 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,6 +164,9 @@
 			dependencies = (
 			);
 			name = WeatherApp;
+			packageProductDependencies = (
+				1F727AD32D10983C0029CFD7 /* Alamofire */,
+			);
 			productName = WeatherApp;
 			productReference = 1F8CF7AD2CF7A08800E157DB /* WeatherApp.app */;
 			productType = "com.apple.product-type.application";
@@ -190,6 +195,9 @@
 				Base,
 			);
 			mainGroup = 1F8CF7A42CF7A08800E157DB;
+			packageReferences = (
+				1F727AD22D10983C0029CFD7 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			productRefGroup = 1F8CF7AE2CF7A08800E157DB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -451,6 +459,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		1F727AD22D10983C0029CFD7 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = exactVersion;
+				version = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1F727AD32D10983C0029CFD7 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1F727AD22D10983C0029CFD7 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1F8CF7A52CF7A08800E157DB /* Project object */;
 }

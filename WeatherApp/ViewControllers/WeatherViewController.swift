@@ -18,14 +18,16 @@ final class WeatherViewController: UIViewController {
     @IBOutlet var weatherParametersLabel: UILabel!
     
     //MARK: Private properties
-    private var weather: Weather?
+    private var locations: Location?
+    private var currents: Current?
     private let networkManager = NetworkManager.shared
-    var city: String? // Выбранный город
+    private var activityIndicator: UIActivityIndicatorView?
     
+    var city: String? // Выбранный город
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         if let city = city {
             fetchWeather(for: city)
         }
@@ -42,41 +44,65 @@ final class WeatherViewController: UIViewController {
             print("Некорректный URL для города \(city)")
             return
         }
-
-        networkManager.fetchCurrentWeather(Weather.self, from: url) { [weak self] result in
+        
+        showLoadingIndicator()
+        
+        networkManager.fetchCurrentsData(from: url) { [unowned self] result in
+            hideLoadingIndicator()
             switch result {
-            case .success(let weather):
-                DispatchQueue.main.async {
-                    self?.view.setGradient(weatherCode: weather.current.weatherCode)
-                    self?.cityLabel.text = "\(weather.location.region),"
-                    self?.countryLabel.text = weather.location.country
-                    self?.temperatureLabel.text = "\(weather.current.temperature) °С"
-                    self?.weatherDescription.text = weather.current.weatherDescriptions.first
-                    self?.fetchImage(from: weather.current.weatherIcons.first)
-                    self?.weatherParametersLabel.text = weather.current.weatherParameters
+            case .success(let current):
+                currents = current
+                view.setGradient(weatherCode: current.weatherCode)
+                temperatureLabel.text = "\(current.temperature) °C"
+                weatherDescription.text = current.weatherDescriptions.first
+                weatherParametersLabel.text = current.weatherParameters
+                
+                if let imageURL = current.weatherIcons.first {
+                    fetchImage(from: imageURL)
                 }
+                
+            case .failure(let error):
+                print(error)
+            }
+        }
+        
+        networkManager.fetchLocationsData(from: url) { [unowned self] result in
+            switch result {
+            case .success(let location):
+                locations = location
+                cityLabel.text = location.name
+                countryLabel.text = location.country
             case .failure(let error):
                 print(error)
             }
         }
     }
     
-    private func fetchImage(from url: URL?) {
-        guard let iconURL = url else {
-            print("URL для иконки отсутствует")
-            return
-        }
-        
-        networkManager.fetchImage(from: iconURL) { [weak self] result in
+    private func fetchImage(from url: URL) {
+        networkManager.fetchData(from: url) { [unowned self] result in
             switch result {
             case .success(let imageData):
-                DispatchQueue.main.async {
-                    self?.weatherImage.image = UIImage(data: imageData)
-                }
+                weatherImage.image = UIImage(data: imageData)
             case .failure(let error):
-                print("Ошибка загрузки изображения: \(error)")
+                print(error)
             }
         }
+    }
+    
+    private func showLoadingIndicator() {
+        activityIndicator = UIActivityIndicatorView(style: .large)
+        activityIndicator?.color = .white
+        activityIndicator?.center = view.center
+        activityIndicator?.startAnimating()
+        if let indicator = activityIndicator {
+            view.addSubview(indicator)
+        }
+    }
+    
+    private func hideLoadingIndicator() {
+        activityIndicator?.stopAnimating()
+        activityIndicator?.removeFromSuperview()
+        activityIndicator = nil
     }
 }
 

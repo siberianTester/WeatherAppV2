@@ -11,7 +11,6 @@ extension UIView {
     func setGradient(weatherCode: Int?) {
         
         var gradientColors: [UIColor] {
-            print(weatherCode ?? "")
             switch weatherCode {
             case 113: // Ясно
                 return [UIColor.blue, UIColor.white]

@@ -7,52 +7,36 @@
 
 import Foundation
 
-// MARK: - Main Structs
-struct Weather: Decodable {
-    let request: Request
-    let location: Location
-    let current: Current
-}
-
-// MARK: - Request Struct
-struct Request: Decodable {
-    let type: String
-    let query: String
-    let language: String
-    let unit: String
-}
-
 // MARK: - Location Struct
-struct Location: Decodable {
+struct Location {
     let name: String
     let country: String
-    let region: String
-    let lat: String
-    let lon: String
-    let timezoneId: String
-    let localtime: String
-    let localtimeEpoch: Int
-    let utcOffset: String
+    
+    init(locationData: [String: Any]) {
+        name = locationData["name"] as? String ?? ""
+        country = locationData["country"] as? String ?? ""
+    }
+    
+    static func getLocation(from locations: Any) -> Location? {
+        guard let locations = locations as? [String: Any] else { return nil }
+        guard let locationData = locations["location"] as? [String: Any] else { return nil }
+        
+        return Location(locationData: locationData)
+    }
 }
 
 // MARK: - Current Struct
-struct Current: Decodable {
+struct Current {
     let observationTime: String
     let temperature: Int
     let weatherCode: Int
     let weatherIcons: [URL]
     let weatherDescriptions: [String]
     let windSpeed: Int
-    let windDegree: Int
     let windDir: String
     let pressure: Int
-    let precip: Int
     let humidity: Int
-    let cloudcover: Int
-    let feelslike: Int
-    let uvIndex: Int
     let visibility: Int
-    let isDay: String
     
     var weatherParameters: String {
         """
@@ -68,5 +52,29 @@ struct Current: Decodable {
         
         Observation time: \(observationTime)
         """
+    }
+    
+    init(currentData: [String: Any]) {
+        observationTime = currentData["observation_time"] as? String ?? ""
+        temperature = currentData["temperature"] as? Int ?? 0
+        weatherCode = currentData["weather_code"] as? Int ?? 0
+        
+        if let icons = currentData["weather_icons"] as? [String] {
+            weatherIcons = icons.compactMap { URL(string: $0) }
+        } else { weatherIcons = [] }
+        
+        weatherDescriptions = currentData["weather_descriptions"] as? [String] ?? [""]
+        windSpeed = currentData["wind_speed"] as? Int ?? 0
+        windDir = currentData["wind_dir"] as? String ?? ""
+        pressure = currentData["pressure"] as? Int ?? 0
+        humidity = currentData["humidity"] as? Int ?? 0
+        visibility = currentData["visibility"] as? Int ?? 0
+    }
+    
+    static func getCurrentWeather(from currents: Any) -> Current? {
+        guard let currents = currents as? [String: Any] else { return nil }
+        guard let currentData = currents["current"] as? [String: Any] else { return nil }
+        
+        return Current(currentData: currentData)
     }
 }

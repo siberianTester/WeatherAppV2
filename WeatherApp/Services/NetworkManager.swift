@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Alamofire
 
 enum NetworkError: Error {
     case invalidURL
@@ -17,55 +18,56 @@ final class NetworkManager {
     
     static let shared = NetworkManager()
     
-    private let accessKey = "b3a30d63fa388c5b3ff84313adac4395"
-
+    private let accessKey = "c3ff97d872240d16c55c07e0725fe592"
+    
     func createWeatherURL(for city: String) -> URL? {
         let urlString = "https://api.weatherstack.com/current?access_key=\(accessKey)&query=\(city)"
         return URL(string: urlString)
     }
     
-    func fetchImage(from url: URL, completion: @escaping (Result<Data, NetworkError>) -> Void) {
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            if let error = error {
-                print("Ошибка запроса изображения: \(error.localizedDescription)")
-                completion(.failure(.noData))
-                return
-            }
-            
-            guard let data = data else {
-                print("Нет данных изображения")
-                completion(.failure(.noData))
-                return
-            }
-            
-            DispatchQueue.main.async {
-                completion(.success(data))
-            }
-        }.resume()
-    }
-
-    
-    func fetchCurrentWeather<T: Decodable>(_ type: T.Type, from url: URL, completion: @escaping(Result<T, NetworkError>) -> Void) {
-        URLSession.shared.dataTask(with: url) { data, _, error in
-            guard let data else {
-                print(error?.localizedDescription ?? "No error description")
-                return
-            }
-            
-            do {
-                let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
-                let weather = try decoder.decode(T.self, from: data)
-                DispatchQueue.main.async {
-                    completion(.success(weather))
+    func fetchLocationsData(from url: URL, completion: @escaping(Result<Location, AFError>) -> Void) {
+        AF.request(url)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                case .success(let value):
+                    guard let location = Location.getLocation(from: value) else { return }
+                    completion(.success(location))
+                    
+                case .failure(let error):
+                    print(error)
                 }
-                print(weather)
-            } catch {
-                completion(.failure(.decodingError))
-                print(error.localizedDescription)
             }
-            
-        }.resume()
     }
+    
+    func fetchCurrentsData(from url: URL, completion: @escaping(Result<Current, AFError>) -> Void) {
+        AF.request(url)
+            .validate()
+            .responseJSON { response in
+                switch response.result {
+                case .success(let value):
+                    guard let current = Current.getCurrentWeather(from: value) else { return }
+                    completion(.success(current))
+                    print(current.weatherIcons)
+                    
+                case .failure(let error):
+                    print(error)
+                }
+            }
+    }
+    
+    func fetchData(from url: URL, completion: @escaping(Result<Data, AFError>) -> Void ) {
+        AF.request(url)
+            .validate()
+            .responseData { dataResponse in
+                switch dataResponse.result {
+                case .success(let data):
+                    completion(.success(data))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+    }
+    
     private init() {}
 }

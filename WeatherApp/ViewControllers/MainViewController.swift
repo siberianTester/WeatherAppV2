@@ -10,12 +10,11 @@ import UIKit
 enum Cities: CaseIterable {
     case SaintPetersburg
     case Omsk
-    case Losangeles
+    case LosAngeles
     case Boston
     case Berlin
     case Novosibirsk
     case Tokyo
-
     
     var cityName: String {
         switch self {
@@ -23,7 +22,7 @@ enum Cities: CaseIterable {
             return "Saint-Petersburg"
         case .Omsk:
             return "Omsk"
-        case .Losangeles:
+        case .LosAngeles:
             return "Los-Angeles"
         case .Boston:
             return "Boston"
@@ -54,14 +53,11 @@ final class MainViewController: UICollectionViewController {
         return cell
     }
     
-    override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedCity = cities[indexPath.item].cityName
-        
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        
-        if let weatherVC = storyboard.instantiateViewController(withIdentifier: "showWeather") as? WeatherViewController {
-            weatherVC.city = selectedCity
-            navigationController?.pushViewController(weatherVC, animated: false)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "showWeather",
+           let destinationVC = segue.destination as? WeatherViewController,
+           let indexPath = collectionView.indexPathsForSelectedItems?.first {
+            destinationVC.city = cities[indexPath.item].cityName
         }
     }
 }
